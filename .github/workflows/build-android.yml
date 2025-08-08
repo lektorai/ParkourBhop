@@ -17,25 +17,31 @@ jobs:
 
       - name: Download Godot from GitHub mirror
         run: |
-          # Скачиваем бинарник и экспортные шаблоны (tpz = zip)
+          # Бинарник и шаблоны (tpz = zip)
           wget https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip
           wget https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_export_templates.tpz
 
-          # Распаковываем бинарник
+          # Распаковка Godot
           unzip -o Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip -d godot
           chmod +x godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64
 
-          # Распаковываем экспортные шаблоны (tpz — это zip)
+          # Распаковка экспортных шаблонов
           mkdir -p ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
           unzip -o Godot_v${GODOT_VERSION}-stable_export_templates.tpz -d ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
 
-          echo "== Templates =="
-          ls -la ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable || true
+      - name: Unpack project zip if present
+        run: |
+          if [ -f ParkourBhop_Godot4_Project.zip ]; then
+            echo "Found project zip, unpacking..."
+            unzip -o ParkourBhop_Godot4_Project.zip -d .
+          else
+            echo "No project zip found, assuming files are already unpacked."
+          fi
+          echo "== Repo root after unpack =="
+          ls -la
 
       - name: Quick sanity check (project files)
         run: |
-          echo "== Repo root =="
-          ls -la
           echo "project.godot present?"; test -f project.godot && echo YES || (echo NO && exit 1)
           echo "export_presets.cfg present?"; test -f export_presets.cfg && echo YES || (echo NO && exit 1)
 

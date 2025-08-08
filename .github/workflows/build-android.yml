@@ -1,9 +1,6 @@
 name: Build Android (Godot 4)
 
 on:
-  push:
-    tags:
-      - "v*"
   workflow_dispatch:
 
 jobs:
@@ -11,8 +8,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GODOT_VERSION: "4.2.2"
-      HOME: "/home/runner"
-      XDG_CONFIG_HOME: "/home/runner/.config"
 
     steps:
       - name: Checkout
@@ -24,7 +19,7 @@ jobs:
           wget https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_export_templates.tpz
           unzip -o Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip -d godot
           chmod +x godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64
-          TEMPL=${HOME}/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+          TEMPL=$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable
           mkdir -p "$TEMPL"
           unzip -o Godot_v${GODOT_VERSION}-stable_export_templates.tpz -d "$TEMPL"
           if [ -d "$TEMPL/templates" ]; then mv "$TEMPL/templates/"* "$TEMPL"/ && rmdir "$TEMPL/templates"; fi
@@ -37,29 +32,57 @@ jobs:
       - name: Ensure project files exist
         run: |
           test -f project.godot || (echo "project.godot missing" && exit 1)
-          test -f export_presets.cfg || (echo "export_presets.cfg missing" && exit 1)
 
-      - name: Create debug keystore
+      - name: Create debug keystore IN PROJECT (res://debug.keystore)
         run: |
-          mkdir -p ${HOME}/.android
+          # создаём ключ прямо в корне проекта
           keytool -genkeypair -alias androiddebugkey \
-            -keypass android -keystore ${HOME}/.android/debug.keystore \
+            -keypass android -keystore debug.keystore \
             -storepass android -dname "CN=Android Debug,O=Android,C=US" \
             -keyalg RSA -keysize 2048 -validity 10000
-          keytool -list -keystore ${HOME}/.android/debug.keystore -storepass android
+          keytool -list -keystore debug.keystore -storepass android
 
-      - name: Configure Editor Settings (debug keystore)
+      - name: Ensure export_presets.cfg exists and points to res://debug.keystore
         run: |
-          mkdir -p ${XDG_CONFIG_HOME}/godot
-          cat > ${XDG_CONFIG_HOME}/godot/editor_settings-4.tres << EOF
-          [gd_resource type="EditorSettings" load_steps=2 format=3]
+          if [ ! -f export_presets.cfg ]; then
+            cat > export_presets.cfg << 'EOF'
+[preset.0]
+name="Android"
+platform="Android"
+runnable=true
+export_path="build/ParkourBhop-debug.apk"
 
-          [resource]
-          export/android/debug_keystore = "${HOME}/.android/debug.keystore"
-          export/android/debug_keystore_user = "androiddebugkey"
-          export/android/debug_keystore_pass = "android"
-          EOF
-          cat ${XDG_CONFIG_HOME}/godot/editor_settings-4.tres || true
+[preset.0.options]
+architectures/armeabi-v7a=true
+architectures/arm64-v8a=true
+architectures/x86=false
+architectures/x86_64=false
+package/name="ParkourBhop"
+package/unique_name="org.example.parkourbhop"
+version/code=1
+version/name="0.1.0"
+launcher_icons/main_192x192="res://icon.png"
+keystore/debug="res://debug.keystore"
+keystore/debug_user="androiddebugkey"
+keystore/debug_password="android"
+keystore/release="res://debug.keystore"
+keystore/release_user="androiddebugkey"
+keystore/release_password="android"
+custom_template/debug=""
+custom_template/release=""
+one_click_deploy/clear_previous_install=true
+EOF
+          else
+            # Патчим существующий: прописываем res://debug.keystore и оба набора полей
+            sed -i 's#^keystore/debug=.*#keystore/debug="res://debug.keystore"#' export_presets.cfg || true
+            sed -i 's#^keystore/debug_user=.*#keystore/debug_user="androiddebugkey"#' export_presets.cfg || true
+            sed -i 's#^keystore/debug_password=.*#keystore/debug_password="android"#' export_presets.cfg || true
+            grep -q '^keystore/release=' export_presets.cfg || echo 'keystore/release="res://debug.keystore"' >> export_presets.cfg
+            grep -q '^keystore/release_user=' export_presets.cfg || echo 'keystore/release_user="androiddebugkey"' >> export_presets.cfg
+            grep -q '^keystore/release_password=' export_presets.cfg || echo 'keystore/release_password="android"' >> export_presets.cfg
+          fi
+          echo "== export_presets.cfg =="
+          cat export_presets.cfg
 
       - name: Export Android APK (Debug)
         run: |

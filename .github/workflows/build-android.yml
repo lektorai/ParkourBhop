@@ -1,0 +1,39 @@
+name: Build Android (Godot 4)
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  export-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Godot
+        run: |
+          GODOT_VERSION=4.2.2
+          wget https://downloads.tuxfamily.org/godotengine/${GODOT_VERSION}/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip
+          wget https://downloads.tuxfamily.org/godotengine/${GODOT_VERSION}/Godot_v${GODOT_VERSION}-stable_export_templates.tpz
+          unzip Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip -d godot
+          mkdir -p ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+          tar -xf Godot_v${GODOT_VERSION}-stable_export_templates.tpz -C ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+
+      - name: Export Android APK (Debug)
+        run: |
+          ./godot/Godot_v4.2.2-stable_linux.x86_64 --headless --path . --export-debug "Android" build/ParkourBhop-debug.apk
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ParkourBhop-debug.apk
+          path: build/ParkourBhop-debug.apk
+
+      - name: Create Release (if tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/ParkourBhop-debug.apk

@@ -1,4 +1,4 @@
-name: Build Android (Godot 4)
+   name: Build Android (Godot 4)
 
 on:
   push:
@@ -17,12 +17,27 @@ jobs:
 
       - name: Download Godot from GitHub mirror
         run: |
+          # Скачиваем бинарник и экспортные шаблоны (tpz = zip)
           wget https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip
           wget https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_export_templates.tpz
-          unzip Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip -d godot
-          mkdir -p ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
-          tar -xf Godot_v${GODOT_VERSION}-stable_export_templates.tpz -C ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+
+          # Распаковываем бинарник
+          unzip -o Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip -d godot
           chmod +x godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64
+
+          # Распаковываем экспортные шаблоны (tpz — это zip)
+          mkdir -p ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+          unzip -o Godot_v${GODOT_VERSION}-stable_export_templates.tpz -d ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+
+          echo "== Templates =="
+          ls -la ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable || true
+
+      - name: Quick sanity check (project files)
+        run: |
+          echo "== Repo root =="
+          ls -la
+          echo "project.godot present?"; test -f project.godot && echo YES || (echo NO && exit 1)
+          echo "export_presets.cfg present?"; test -f export_presets.cfg && echo YES || (echo NO && exit 1)
 
       - name: Export Android APK (Debug)
         run: |

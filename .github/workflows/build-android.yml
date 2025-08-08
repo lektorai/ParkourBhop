@@ -12,6 +12,8 @@ jobs:
     env:
       GODOT_VERSION: "4.2.2"
       RUNNER_HOME: "/home/runner"
+      HOME: "/home/runner"                 # <- важно
+      XDG_CONFIG_HOME: "/home/runner/.config"  # <- важно
 
     steps:
       - name: Checkout
@@ -27,6 +29,9 @@ jobs:
           mkdir -p "$TEMPL"
           unzip -o Godot_v${GODOT_VERSION}-stable_export_templates.tpz -d "$TEMPL"
           if [ -d "$TEMPL/templates" ]; then mv "$TEMPL/templates/"* "$TEMPL"/ && rmdir "$TEMPL/templates"; fi
+          echo "== Templates =="
+          ls -la "$TEMPL" || true
+          ls -la "$TEMPL/android" || true
 
       - name: Unpack project zip if present
         run: |
@@ -44,11 +49,12 @@ jobs:
             -keypass android -keystore ${RUNNER_HOME}/.android/debug.keystore \
             -storepass android -dname "CN=Android Debug,O=Android,C=US" \
             -keyalg RSA -keysize 2048 -validity 10000
+          keytool -list -keystore ${RUNNER_HOME}/.android/debug.keystore -storepass android
 
       - name: Configure Editor Settings (debug keystore)
         run: |
-          mkdir -p ${RUNNER_HOME}/.config/godot
-          cat > ${RUNNER_HOME}/.config/godot/editor_settings-4.tres << EOF
+          mkdir -p ${XDG_CONFIG_HOME}/godot
+          cat > ${XDG_CONFIG_HOME}/godot/editor_settings-4.tres << EOF
           [gd_resource type="EditorSettings" load_steps=2 format=3]
 
           [resource]
@@ -56,7 +62,8 @@ jobs:
           export/android/debug_keystore_user = "androiddebugkey"
           export/android/debug_keystore_pass = "android"
           EOF
-          cat ${RUNNER_HOME}/.config/godot/editor_settings-4.tres || true
+          echo "== Editor settings =="
+          cat ${XDG_CONFIG_HOME}/godot/editor_settings-4.tres
 
       - name: Write export_presets.cfg (set BOTH debug & release to debug keystore)
         run: |
@@ -65,33 +72,19 @@ jobs:
           name="Android"
           platform="Android"
           runnable=true
-          custom_features=""
-          export_filter="all_resources"
-          include_filter=""
-          exclude_filter=""
           export_path="build/ParkourBhop-debug.apk"
-          encryption_include_filters=""
-          encryption_exclude_filters=""
-          encrypt_pck=false
-          encrypt_directory=false
 
           [preset.0.options]
-          custom_template/debug=""
-          custom_template/release=""
           architectures/armeabi-v7a=true
           architectures/arm64-v8a=true
           architectures/x86=false
           architectures/x86_64=false
-          one_click_deploy/clear_previous_install=true
+          package/name="ParkourBhop"
+          package/unique_name="org.example.parkourbhop"
           version/code=1
           version/name="0.1.0"
-          package/unique_name="org.example.parkourbhop"
-          package/name="ParkourBhop"
           launcher_icons/main_192x192="res://icon.png"
-          graphics/32_bits_framebuffer=true
-          screen/immersive_mode=true
-          xr_features/xr_mode=0
-          # <- ВАЖНО: и debug, и release указывают на один debug keystore
+          # Ключи — и debug, и release указывают на один debug.keystore
           keystore/debug="${RUNNER_HOME}/.android/debug.keystore"
           keystore/debug_user="androiddebugkey"
           keystore/debug_password="android"
@@ -99,14 +92,16 @@ jobs:
           keystore/release_user="androiddebugkey"
           keystore/release_password="android"
           EOF
-
           echo "== export_presets.cfg =="
           cat export_presets.cfg
 
       - name: Export Android APK (Debug)
         run: |
+          echo "HOME=$HOME"
+          echo "XDG_CONFIG_HOME=$XDG_CONFIG_HOME"
           ./godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64 \
-            --headless --path . --export-debug "Android" build/ParkourBhop-debug.apk
+            --headless --verbose --path . \
+            --export-debug "Android" build/ParkourBhop-debug.apk
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

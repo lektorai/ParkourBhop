@@ -46,7 +46,7 @@ jobs:
             -storepass android -dname "CN=Android Debug,O=Android,C=US" \
             -keyalg RSA -keysize 2048 -validity 10000
 
-      - name: Configure Godot Editor Settings (use debug keystore)
+      - name: Configure Godot Editor Settings (debug keystore)
         run: |
           mkdir -p ${RUNNER_HOME}/.config/godot
           cat > ${RUNNER_HOME}/.config/godot/editor_settings-4.tres << EOF
@@ -59,12 +59,20 @@ jobs:
           EOF
           cat ${RUNNER_HOME}/.config/godot/editor_settings-4.tres || true
 
-      - name: Patch export_presets.cfg (remove any release keystore fields)
+      - name: Patch export_presets.cfg (force NO release keystore, set debug fields)
         run: |
-          sed -i '/^keystore\/release/d' export_presets.cfg
-          sed -i '/^keystore\/release_user/d' export_presets.cfg
-          sed -i '/^keystore\/release_password/d' export_presets.cfg
-          echo "== export_presets.cfg after patch =="
+          # Удаляем любые релизные поля
+          sed -i '/^[[:space:]]*keystore\/release/d' export_presets.cfg
+          sed -i '/^[[:space:]]*keystore\/release_user/d' export_presets.cfg
+          sed -i '/^[[:space:]]*keystore\/release_password/d' export_presets.cfg
+          # Вписываем debug-поля внутрь секции [preset.0.options]
+          awk -v kpath="${RUNNER_HOME}/.android/debug.keystore" '
+            BEGIN{done=0}
+            /^\[preset\.0\.options\]/{print; print "keystore/debug=" kpath; print "keystore/debug_user=androiddebugkey"; print "keystore/debug_password=android"; done=1; next}
+            {print}
+            END{if(!done){print "[preset.0.options]"; print "keystore/debug=" kpath; print "keystore/debug_user=androiddebugkey"; print "keystore/debug_password=android"}}
+          ' export_presets.cfg > export_presets.patched && mv export_presets.patched export_presets.cfg
+          echo "== export_presets.cfg =="
           cat export_presets.cfg
 
       - name: Export Android APK (Debug)
@@ -77,9 +85,3 @@ jobs:
         with:
           name: ParkourBhop-debug.apk
           path: build/ParkourBhop-debug.apk
-
-      - name: Create Release (if tag)
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v2
-        with:
-          files: build/ParkourBhop-debug.apk

@@ -58,7 +58,7 @@ jobs:
           EOF
           cat ${RUNNER_HOME}/.config/godot/editor_settings-4.tres || true
 
-      - name: Write a clean export_presets.cfg
+      - name: Write export_presets.cfg (set BOTH debug & release to debug keystore)
         run: |
           cat > export_presets.cfg << EOF
           [preset.0]
@@ -91,9 +91,13 @@ jobs:
           graphics/32_bits_framebuffer=true
           screen/immersive_mode=true
           xr_features/xr_mode=0
+          # <- ВАЖНО: и debug, и release указывают на один debug keystore
           keystore/debug="${RUNNER_HOME}/.android/debug.keystore"
           keystore/debug_user="androiddebugkey"
           keystore/debug_password="android"
+          keystore/release="${RUNNER_HOME}/.android/debug.keystore"
+          keystore/release_user="androiddebugkey"
+          keystore/release_password="android"
           EOF
 
           echo "== export_presets.cfg =="

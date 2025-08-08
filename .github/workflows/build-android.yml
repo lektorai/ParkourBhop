@@ -57,6 +57,20 @@ jobs:
             -storepass android -dname "CN=Android Debug,O=Android,C=US" \
             -keyalg RSA -keysize 2048 -validity 10000
 
+      - name: Configure Godot Editor Settings for Android export
+        run: |
+          mkdir -p ~/.config/godot
+          cat > ~/.config/godot/editor_settings-4.tres << 'EOF'
+          [gd_resource type="EditorSettings" load_steps=2 format=3]
+
+          [resource]
+          export/android/debug_keystore = "~/.android/debug.keystore"
+          export/android/debug_keystore_user = "androiddebugkey"
+          export/android/debug_keystore_pass = "android"
+          EOF
+          echo "== Editor settings written =="
+          cat ~/.config/godot/editor_settings-4.tres || true
+
       - name: Export Android APK (Debug)
         run: |
           ./godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64 \

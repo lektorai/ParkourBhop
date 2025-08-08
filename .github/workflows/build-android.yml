@@ -1,4 +1,4 @@
-   name: Build Android (Godot 4)
+name: Build Android (Godot 4)
 
 on:
   push:

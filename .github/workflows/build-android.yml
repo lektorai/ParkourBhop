@@ -11,54 +11,56 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GODOT_VERSION: "4.2.2"
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Download Godot from GitHub mirror
         run: |
-          # Скачиваем бинарник и экспортные шаблоны (tpz = zip)
+          # Бинарник и экспортные шаблоны (tpz = zip)
           wget https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip
           wget https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_export_templates.tpz
 
-          # Распаковка Godot
+          # Распаковать бинарник
           unzip -o Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip -d godot
           chmod +x godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64
 
-          # Распаковка экспортных шаблонов
+          # Распаковать экспортные шаблоны
           TEMPL=~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
           mkdir -p "$TEMPL"
           unzip -o Godot_v${GODOT_VERSION}-stable_export_templates.tpz -d "$TEMPL"
 
-          # В tpz всё внутри папки "templates/" — поднимем файлы на уровень выше
+          # Внутри tpz всё в подпапке "templates/" — поднимем наверх
           if [ -d "$TEMPL/templates" ]; then
             mv "$TEMPL/templates/"* "$TEMPL"/
             rmdir "$TEMPL/templates"
           fi
 
-          echo "== Templates listing =="
-          ls -la "$TEMPL"
-          ls -la "$TEMPL/android" || true
-
       - name: Unpack project zip if present
         run: |
           if [ -f ParkourBhop_Godot4_Project.zip ]; then
-            echo "Found project zip, unpacking..."
             unzip -o ParkourBhop_Godot4_Project.zip -d .
-          else
-            echo "No project zip found, assuming files are already unpacked."
           fi
-          echo "== Repo root after unpack =="
           ls -la
 
       - name: Quick sanity check (project files)
         run: |
-          echo "project.godot present?"; test -f project.godot && echo YES || (echo NO && exit 1)
-          echo "export_presets.cfg present?"; test -f export_presets.cfg && echo YES || (echo NO && exit 1)
+          test -f project.godot || (echo "project.godot missing" && exit 1)
+          test -f export_presets.cfg || (echo "export_presets.cfg missing" && exit 1)
+
+      - name: Create debug keystore
+        run: |
+          mkdir -p ~/.android
+          keytool -genkeypair -alias androiddebugkey \
+            -keypass android -keystore ~/.android/debug.keystore \
+            -storepass android -dname "CN=Android Debug,O=Android,C=US" \
+            -keyalg RSA -keysize 2048 -validity 10000
 
       - name: Export Android APK (Debug)
         run: |
-          ./godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64 --headless --path . --export-debug "Android" build/ParkourBhop-debug.apk
+          ./godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64 \
+            --headless --path . --export-debug "Android" build/ParkourBhop-debug.apk
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

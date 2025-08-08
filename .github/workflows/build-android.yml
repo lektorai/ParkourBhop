@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GODOT_VERSION: "4.2.2"
+      RUNNER_HOME: "/home/runner"
 
     steps:
       - name: Checkout
@@ -18,30 +19,18 @@ jobs:
 
       - name: Download Godot from GitHub mirror
         run: |
-          # Бинарник и экспортные шаблоны (tpz = zip)
           wget https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip
           wget https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_export_templates.tpz
-
-          # Распаковать бинарник
           unzip -o Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip -d godot
           chmod +x godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64
-
-          # Распаковать экспортные шаблоны
-          TEMPL=~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+          TEMPL=${RUNNER_HOME}/.local/share/godot/export_templates/${GODOT_VERSION}.stable
           mkdir -p "$TEMPL"
           unzip -o Godot_v${GODOT_VERSION}-stable_export_templates.tpz -d "$TEMPL"
-
-          # Внутри tpz всё в подпапке "templates/" — поднимем наверх
-          if [ -d "$TEMPL/templates" ]; then
-            mv "$TEMPL/templates/"* "$TEMPL"/
-            rmdir "$TEMPL/templates"
-          fi
+          if [ -d "$TEMPL/templates" ]; then mv "$TEMPL/templates/"* "$TEMPL"/ && rmdir "$TEMPL/templates"; fi
 
       - name: Unpack project zip if present
         run: |
-          if [ -f ParkourBhop_Godot4_Project.zip ]; then
-            unzip -o ParkourBhop_Godot4_Project.zip -d .
-          fi
+          if [ -f ParkourBhop_Godot4_Project.zip ]; then unzip -o ParkourBhop_Godot4_Project.zip -d .; fi
           ls -la
 
       - name: Quick sanity check (project files)
@@ -51,25 +40,25 @@ jobs:
 
       - name: Create debug keystore
         run: |
-          mkdir -p ~/.android
+          mkdir -p ${RUNNER_HOME}/.android
           keytool -genkeypair -alias androiddebugkey \
-            -keypass android -keystore ~/.android/debug.keystore \
+            -keypass android -keystore ${RUNNER_HOME}/.android/debug.keystore \
             -storepass android -dname "CN=Android Debug,O=Android,C=US" \
             -keyalg RSA -keysize 2048 -validity 10000
 
       - name: Configure Godot Editor Settings for Android export
         run: |
-          mkdir -p ~/.config/godot
-          cat > ~/.config/godot/editor_settings-4.tres << 'EOF'
+          mkdir -p ${RUNNER_HOME}/.config/godot
+          cat > ${RUNNER_HOME}/.config/godot/editor_settings-4.tres << EOF
           [gd_resource type="EditorSettings" load_steps=2 format=3]
 
           [resource]
-          export/android/debug_keystore = "~/.android/debug.keystore"
+          export/android/debug_keystore = "${RUNNER_HOME}/.android/debug.keystore"
           export/android/debug_keystore_user = "androiddebugkey"
           export/android/debug_keystore_pass = "android"
           EOF
           echo "== Editor settings written =="
-          cat ~/.config/godot/editor_settings-4.tres || true
+          cat ${RUNNER_HOME}/.config/godot/editor_settings-4.tres || true
 
       - name: Export Android APK (Debug)
         run: |

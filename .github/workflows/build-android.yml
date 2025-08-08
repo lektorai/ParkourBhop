@@ -17,7 +17,7 @@ jobs:
 
       - name: Download Godot from GitHub mirror
         run: |
-          # Бинарник и шаблоны (tpz = zip)
+          # Скачиваем бинарник и экспортные шаблоны (tpz = zip)
           wget https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip
           wget https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_export_templates.tpz
 
@@ -26,8 +26,19 @@ jobs:
           chmod +x godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64
 
           # Распаковка экспортных шаблонов
-          mkdir -p ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
-          unzip -o Godot_v${GODOT_VERSION}-stable_export_templates.tpz -d ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+          TEMPL=~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+          mkdir -p "$TEMPL"
+          unzip -o Godot_v${GODOT_VERSION}-stable_export_templates.tpz -d "$TEMPL"
+
+          # В tpz всё внутри папки "templates/" — поднимем файлы на уровень выше
+          if [ -d "$TEMPL/templates" ]; then
+            mv "$TEMPL/templates/"* "$TEMPL"/
+            rmdir "$TEMPL/templates"
+          fi
+
+          echo "== Templates listing =="
+          ls -la "$TEMPL"
+          ls -la "$TEMPL/android" || true
 
       - name: Unpack project zip if present
         run: |

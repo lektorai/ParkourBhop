@@ -1,0 +1,290 @@
+extends Node
+## Tiny in-code localisation. Russian is the primary locale (RuStore audience),
+## English is the fallback for everyone else.
+
+signal locale_changed
+
+var locale: String = "ru"
+
+const STRINGS := {
+	"ru": {
+		"app_title": "Японские кроссворды",
+		"app_subtitle": "Нонограммы · бесконечные уровни",
+		"play": "Играть",
+		"continue": "Продолжить",
+		"daily": "Головоломка дня",
+		"daily_done": "Решено ✓",
+		"gallery": "Галерея картинок",
+		"stats": "Статистика",
+		"settings": "Настройки",
+		"level_n": "Уровень {n}",
+		"level_short": "Ур. {n}",
+		"size_5": "5×5 · Разминка",
+		"size_10": "10×10 · Классика",
+		"size_15": "15×15 · Эксперт",
+		"streak": "Серия дней: {n}",
+		"choose_level": "Выбор уровня",
+		"solved_count": "Решено: {n}",
+		"fill": "Закрасить",
+		"cross": "Крестик",
+		"undo": "Отмена",
+		"hint": "Подсказка",
+		"hint_n": "Подсказка · {n}",
+		"hint_ad": "Подсказка за рекламу",
+		"hint_cooldown": "Подсказка через {n} с",
+		"mistakes": "Ошибки {n}/{max}",
+		"solved_title": "Решено!",
+		"time_label": "Время",
+		"next": "Следующий",
+		"to_menu": "В меню",
+		"replay": "Ещё раз",
+		"out_of_lives": "Ошибки закончились",
+		"out_of_lives_text": "Посмотрите рекламу, чтобы получить ещё 3 попытки, или начните заново.",
+		"watch_ad_continue": "Реклама → ещё 3 попытки",
+		"continue_free": "Продолжить",
+		"restart": "Начать заново",
+		"new_record": "Новый рекорд!",
+		"ad_not_ready": "Реклама ещё не загрузилась. Попробуйте чуть позже.",
+		"loading": "Генерация…",
+		"back": "Назад",
+		"ok": "Ок",
+		"cancel": "Отмена",
+		"gallery_title": "Галерея",
+		"gallery_hint": "Решите кроссворд, чтобы открыть картинку",
+		"solved": "Решено",
+		"stats_title": "Статистика",
+		"solved_total": "Решено всего",
+		"time_total": "Время в игре",
+		"best_time": "Лучшее время {s}×{s}",
+		"daily_streak": "Текущая серия",
+		"best_streak": "Лучшая серия",
+		"pictures_solved": "Картинок открыто",
+		"stars_total": "Звёзд собрано",
+		"language": "Язык",
+		"sound": "Звук",
+		"vibration": "Вибрация",
+		"show_mistakes": "Показывать ошибки",
+		"show_mistakes_hint": "Неверная клетка сразу помечается, 3 ошибки — проигрыш",
+		"auto_cross": "Авто-крестики в готовых линиях",
+		"dark_theme": "Тёмная тема",
+		"remove_ads": "Убрать рекламу",
+		"remove_ads_done": "Реклама отключена ✓",
+		"restore_purchases": "Восстановить покупки",
+		"buy_hints": "Купить 20 подсказок",
+		"hints_bank": "Запас подсказок: {n}",
+		"privacy": "Политика конфиденциальности",
+		"version": "Версия {v}",
+		"billing_unavailable": "Покупки недоступны на этом устройстве",
+		"purchase_ok": "Покупка выполнена, спасибо!",
+		"purchase_fail": "Покупка не удалась",
+		"restored": "Покупки восстановлены",
+		"yes": "Да",
+		"no": "Нет",
+		"quit_puzzle_q": "Выйти? Прогресс сохранится.",
+		"sec_short": "с",
+		"min_short": "м",
+		"hour_short": "ч",
+		"tap_help": "Нажмите — закрасить, проведите — заполнить линию",
+		"pic_heart": "Сердце",
+		"pic_star": "Звезда",
+		"pic_house": "Домик",
+		"pic_cat": "Котик",
+		"pic_tree": "Ёлка",
+		"pic_cup": "Чашка",
+		"pic_umbrella": "Зонт",
+		"pic_mushroom": "Гриб",
+		"pic_apple": "Яблоко",
+		"pic_key": "Ключ",
+		"pic_boat": "Лодка",
+		"pic_duck": "Утка",
+		"pic_flower": "Цветок",
+		"pic_car": "Машина",
+		"pic_fish": "Рыбка",
+		"pic_butterfly": "Бабочка",
+		"pic_crown": "Корона",
+		"pic_bell": "Колокольчик",
+		"pic_anchor": "Якорь",
+		"pic_rocket": "Ракета",
+		"pic_ghost": "Привидение",
+		"pic_snowman": "Снеговик",
+		"pic_smile": "Улыбка",
+		"pic_clover": "Клевер",
+		"pic_bunny": "Зайчик",
+		"pic_camera": "Фотоаппарат",
+		"pic_pine": "Сосна",
+		"pic_castle": "Замок",
+		"pic_dog": "Пёсик",
+		"pic_lamp": "Лампа",
+		"pic_sailboat15": "Парусник",
+		"pic_owl15": "Сова",
+		"pic_teapot15": "Чайник",
+		"pic_guitar15": "Гитара",
+		"pic_tulip15": "Тюльпан",
+		"pic_panda15": "Панда",
+		"pic_whale15": "Кит",
+		"pic_rocket15": "Ракета",
+	},
+	"en": {
+		"app_title": "Nonograms",
+		"app_subtitle": "Picture cross · endless levels",
+		"play": "Play",
+		"continue": "Continue",
+		"daily": "Daily puzzle",
+		"daily_done": "Solved ✓",
+		"gallery": "Picture gallery",
+		"stats": "Statistics",
+		"settings": "Settings",
+		"level_n": "Level {n}",
+		"level_short": "Lv. {n}",
+		"size_5": "5×5 · Warm-up",
+		"size_10": "10×10 · Classic",
+		"size_15": "15×15 · Expert",
+		"streak": "Day streak: {n}",
+		"choose_level": "Choose level",
+		"solved_count": "Solved: {n}",
+		"fill": "Fill",
+		"cross": "Cross",
+		"undo": "Undo",
+		"hint": "Hint",
+		"hint_n": "Hint · {n}",
+		"hint_ad": "Hint for an ad",
+		"hint_cooldown": "Hint in {n} s",
+		"mistakes": "Mistakes {n}/{max}",
+		"solved_title": "Solved!",
+		"time_label": "Time",
+		"next": "Next",
+		"to_menu": "Menu",
+		"replay": "Replay",
+		"out_of_lives": "Out of mistakes",
+		"out_of_lives_text": "Watch an ad to get 3 more tries, or start over.",
+		"watch_ad_continue": "Ad → 3 more tries",
+		"continue_free": "Continue",
+		"restart": "Restart",
+		"new_record": "New record!",
+		"ad_not_ready": "The ad is not ready yet. Please try again shortly.",
+		"loading": "Generating…",
+		"back": "Back",
+		"ok": "OK",
+		"cancel": "Cancel",
+		"gallery_title": "Gallery",
+		"gallery_hint": "Solve the puzzle to reveal the picture",
+		"solved": "Solved",
+		"stats_title": "Statistics",
+		"solved_total": "Puzzles solved",
+		"time_total": "Time played",
+		"best_time": "Best time {s}×{s}",
+		"daily_streak": "Current streak",
+		"best_streak": "Best streak",
+		"pictures_solved": "Pictures revealed",
+		"stars_total": "Stars collected",
+		"language": "Language",
+		"sound": "Sound",
+		"vibration": "Vibration",
+		"show_mistakes": "Show mistakes",
+		"show_mistakes_hint": "Wrong cells are marked instantly, 3 mistakes end the puzzle",
+		"auto_cross": "Auto-cross completed lines",
+		"dark_theme": "Dark theme",
+		"remove_ads": "Remove ads",
+		"remove_ads_done": "Ads removed ✓",
+		"restore_purchases": "Restore purchases",
+		"buy_hints": "Buy 20 hints",
+		"hints_bank": "Hint bank: {n}",
+		"privacy": "Privacy policy",
+		"version": "Version {v}",
+		"billing_unavailable": "Purchases are unavailable on this device",
+		"purchase_ok": "Purchase complete, thank you!",
+		"purchase_fail": "Purchase failed",
+		"restored": "Purchases restored",
+		"yes": "Yes",
+		"no": "No",
+		"quit_puzzle_q": "Leave? Progress will be saved.",
+		"sec_short": "s",
+		"min_short": "m",
+		"hour_short": "h",
+		"tap_help": "Tap to fill, drag to fill a line",
+		"pic_heart": "Heart",
+		"pic_star": "Star",
+		"pic_house": "House",
+		"pic_cat": "Cat",
+		"pic_tree": "Fir tree",
+		"pic_cup": "Cup",
+		"pic_umbrella": "Umbrella",
+		"pic_mushroom": "Mushroom",
+		"pic_apple": "Apple",
+		"pic_key": "Key",
+		"pic_boat": "Boat",
+		"pic_duck": "Duck",
+		"pic_flower": "Flower",
+		"pic_car": "Car",
+		"pic_fish": "Fish",
+		"pic_butterfly": "Butterfly",
+		"pic_crown": "Crown",
+		"pic_bell": "Bell",
+		"pic_anchor": "Anchor",
+		"pic_rocket": "Rocket",
+		"pic_ghost": "Ghost",
+		"pic_snowman": "Snowman",
+		"pic_smile": "Smile",
+		"pic_clover": "Clover",
+		"pic_bunny": "Bunny",
+		"pic_camera": "Camera",
+		"pic_pine": "Pine",
+		"pic_castle": "Castle",
+		"pic_dog": "Dog",
+		"pic_lamp": "Lamp",
+		"pic_sailboat15": "Sailboat",
+		"pic_owl15": "Owl",
+		"pic_teapot15": "Teapot",
+		"pic_guitar15": "Guitar",
+		"pic_tulip15": "Tulip",
+		"pic_panda15": "Panda",
+		"pic_whale15": "Whale",
+		"pic_rocket15": "Rocket",
+	},
+}
+
+
+func _ready() -> void:
+	var saved := str(SaveData.get_setting("lang"))
+	if saved == "ru" or saved == "en":
+		locale = saved
+	else:
+		locale = "ru" if OS.get_locale_language() == "ru" else "en"
+
+
+func set_locale(l: String) -> void:
+	if not STRINGS.has(l):
+		return
+	locale = l
+	locale_changed.emit()
+
+
+func t(key: String, args: Dictionary = {}) -> String:
+	var table: Dictionary = STRINGS[locale]
+	var s: String = table.get(key, STRINGS.en.get(key, key))
+	if not args.is_empty():
+		s = s.format(args)
+	return s
+
+
+## Formats seconds as m:ss or h:mm:ss.
+func fmt_time(seconds: float) -> String:
+	var s := int(seconds)
+	var h := s / 3600
+	var m := (s % 3600) / 60
+	var sec := s % 60
+	if h > 0:
+		return "%d:%02d:%02d" % [h, m, sec]
+	return "%d:%02d" % [m, sec]
+
+
+## Compact duration like "2ч 15м".
+func fmt_duration(seconds: float) -> String:
+	var s := int(seconds)
+	var h := s / 3600
+	var m := (s % 3600) / 60
+	if h > 0:
+		return "%d%s %d%s" % [h, t("hour_short"), m, t("min_short")]
+	if m > 0:
+		return "%d%s %d%s" % [m, t("min_short"), s % 60, t("sec_short")]
+	return "%d%s" % [s, t("sec_short")]

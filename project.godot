@@ -1,0 +1,57 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters vary between versions.
+;
+; Format: https://docs.godotengine.org/en/stable/tutorials/io/config_files.html#config-files
+config_version=5
+
+[application]
+
+config/name="Японские кроссворды"
+config/description="Нонограммы: бесконечные японские кроссворды, ежедневная головоломка и галерея картинок."
+config/version="1.0.0"
+run/main_scene="res://scenes/main_menu.tscn"
+config/quit_on_go_back=false
+config/features=PackedStringArray("4.4", "Mobile")
+boot_splash/bg_color=Color(0.965, 0.953, 0.925, 1)
+boot_splash/show_image=false
+config/icon="res://icon.png"
+
+[autoload]
+
+SaveData="*res://autoload/save_data.gd"
+I18n="*res://autoload/i18n.gd"
+Ui="*res://autoload/ui.gd"
+Sfx="*res://autoload/sfx.gd"
+Ads="*res://autoload/ads.gd"
+Billing="*res://autoload/billing.gd"
+Session="*res://autoload/session.gd"
+
+[debug]
+
+gdscript/warnings/inference_on_variant=1
+gdscript/warnings/untyped_declaration=0
+
+[display]
+
+window/size/viewport_width=720
+window/size/viewport_height=1280
+window/handheld/orientation=1
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
+[gui]
+
+common/snap_controls_to_pixels=true
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=true
+pointing/android/enable_long_press_as_right_click=false
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/vram_compression/import_etc2_astc=true
+anti_aliasing/quality/msaa_2d=1

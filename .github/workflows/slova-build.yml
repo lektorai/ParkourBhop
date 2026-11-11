@@ -34,7 +34,8 @@ jobs:
 
       - name: Сквозные тесты (Playwright)
         run: |
-          npx playwright install --with-deps chromium
+          # Системные библиотеки для Chromium на ubuntu-latest уже есть, поэтому ставим только сам браузер.
+          npx playwright install chromium
           npm run e2e
 
       - name: Архив для Яндекс Игр

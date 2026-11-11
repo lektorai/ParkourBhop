@@ -425,3 +425,39 @@ test('игра не обращается к внешним адресам', asyn
   await page.waitForTimeout(500);
   expect(external).toEqual([]);
 });
+
+test('системная кнопка «Назад» (Android): окно → предыдущий экран → диалог выхода', async ({ page }) => {
+  await openGame(page);
+  const back = () => page.evaluate(() => (window as unknown as { __localPlatform: { back: () => void } }).__localPlatform.back());
+  await startFirstLevel(page);
+  await page.getByTestId('hint').click();
+  await submitWord(page, 'лук');
+  await expect(page.locator('[data-word="лук"]')).toHaveAttribute('data-found', '1');
+
+  // Из уровня — в меню.
+  await back();
+  await expect(page.getByTestId('screen-menu')).toBeVisible();
+  // В меню встречает ежедневный бонус; «Назад» закрывает окно, не выдавая награду.
+  await expect(page.getByTestId('daily')).toBeVisible();
+  await back();
+  await expect(page.getByTestId('daily')).toHaveCount(0);
+  expect(await coins(page)).toBe(150);
+  // Из меню — диалог выхода, повторное нажатие закрывает его.
+  await back();
+  await expect(page.getByTestId('exit')).toBeVisible();
+  await back();
+  await expect(page.getByTestId('exit')).toHaveCount(0);
+  // Из вложенного экрана — в меню; открытое окно закрывается первым.
+  await page.getByTestId('menu-settings').click();
+  await page.getByTestId('open-about').click();
+  await back();
+  await expect(page.getByTestId('about')).toHaveCount(0);
+  await expect(page.getByTestId('screen-settings')).toBeVisible();
+  await back();
+  await expect(page.getByTestId('screen-menu')).toBeVisible();
+  // Неполученный бонус предлагается снова; прогресс на месте.
+  await page.getByTestId('daily-claim').click();
+  expect(await coins(page)).toBe(170);
+  await page.getByTestId('menu-play').click();
+  await expect(page.locator('[data-word="лук"]')).toHaveAttribute('data-found', '1');
+});

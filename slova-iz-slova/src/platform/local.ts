@@ -20,6 +20,8 @@ export interface LocalPlatformOptions {
   timeShiftMs: number;
   /** Журнал вызовов — его читают e2e-тесты. */
   log: string[];
+  /** Имитация системной кнопки «Назад» (как на Android). */
+  back: () => void;
 }
 
 declare global {
@@ -42,17 +44,19 @@ export class LocalAdapter implements PlatformAdapter {
 
   private pauseCallbacks: (() => void)[] = [];
   private resumeCallbacks: (() => void)[] = [];
+  private backCallbacks: (() => void)[] = [];
   private options: LocalPlatformOptions = {
     adDurationMs: 900,
     adsFail: false,
     rewardedSkipped: false,
     timeShiftMs: 0,
     log: [],
+    back: () => this.backCallbacks.forEach((cb) => cb()),
   };
 
   async init(): Promise<void> {
     const overrides = window.__localPlatform ?? {};
-    this.options = { ...this.options, ...overrides, log: overrides.log ?? [] };
+    this.options = { ...this.options, ...overrides, log: overrides.log ?? [], back: this.options.back };
     window.__localPlatform = this.options;
   }
 
@@ -177,8 +181,9 @@ export class LocalAdapter implements PlatformAdapter {
     }
   }
 
-  onBack(): void {
-    /* в браузере системной кнопки «Назад» у игры нет */
+  onBack(callback: () => void): void {
+    // В браузере системной кнопки «Назад» нет; тесты вызывают её через window.__localPlatform.back().
+    this.backCallbacks.push(callback);
   }
 
   exitApp(): void {

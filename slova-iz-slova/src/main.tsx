@@ -25,7 +25,11 @@ async function main(): Promise<void> {
   const game = new Game(platform);
 
   // Аудиоконтекст можно запускать только по жесту пользователя.
-  const unlock = () => game.audio.unlock();
+  const unlock = () => {
+    // Игрок нажал на игру — значит, фокус снова у неё (событие focus во встроенном окне приходит не всегда).
+    game.audio.setSuspended('blur', false);
+    game.audio.unlock();
+  };
   window.addEventListener('pointerdown', unlock, { passive: true });
   window.addEventListener('keydown', unlock);
 

@@ -117,8 +117,8 @@ try {
 
   const plan: [theme: string, levelId: number, share: number][] = [
     ['cozy', 12, 0.45],
-    ['sky', 47, 0.4],
-    ['sakura', 28, 0.42],
+    ['sky', 17, 0.4],
+    ['sakura', 31, 0.42],
   ];
   let index = 1;
   for (const [theme, levelId, share] of plan) {

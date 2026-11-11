@@ -1,0 +1,61 @@
+name: Слова из слова — проверка и сборка
+
+# Проверяет игру и собирает архив для Яндекс Игр и Android-сборку для RuStore.
+# Готовые файлы лежат в разделе Artifacts на странице запуска.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'slova-iz-slova/**'
+      - '.github/workflows/slova-build.yml'
+
+defaults:
+  run:
+    working-directory: slova-iz-slova
+
+jobs:
+  check-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: slova-iz-slova/package-lock.json
+
+      - name: Установка зависимостей
+        run: npm ci
+
+      - name: Типы, ESLint, модульные тесты
+        run: npm run check
+
+      - name: Сквозные тесты (Playwright)
+        run: |
+          npx playwright install --with-deps chromium
+          npm run e2e
+
+      - name: Архив для Яндекс Игр
+        run: npm run build:yandex
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yandex-zip
+          path: slova-iz-slova/dist/yandex.zip
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      # Сборка без ключа подписи: проверяет, что Android-проект собирается.
+      # Подписанный AAB для загрузки в RuStore собирается локально (см. README).
+      - name: Android-сборка для RuStore (без подписи)
+        run: npm run build:rustore
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rustore-android-unsigned
+          path: slova-iz-slova/dist/android/

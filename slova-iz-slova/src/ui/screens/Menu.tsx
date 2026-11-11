@@ -34,7 +34,7 @@ export function Menu() {
           {/* Как на референсе: первое слово на своей строке. */}
           {words.length >= 3 ? (
             <>
-              {words[0]}
+              {words[0]}{' '}
               <br />
               {words.slice(1).join(' ')}
             </>

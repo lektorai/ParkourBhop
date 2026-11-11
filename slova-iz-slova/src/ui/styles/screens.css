@@ -145,7 +145,7 @@
 }
 
 .level-btn {
-  min-height: 3.5rem;
+  min-height: max(3.5rem, 48px);
   min-width: 48px;
   display: flex;
   flex-direction: column;
@@ -312,7 +312,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 3.25rem;
+  min-height: max(3.25rem, 48px);
   border-radius: 1.1rem;
   font-size: 1.1rem;
   font-weight: 800;
@@ -373,7 +373,7 @@
   flex: 0 0 auto;
   width: auto;
   min-width: 5.6rem;
-  min-height: 3rem;
+  min-height: max(3rem, 48px);
   margin-left: 0.6rem;
   padding: 0.3rem 0.8rem;
   font-size: 1.02rem;
@@ -402,7 +402,7 @@
   display: flex;
   align-items: center;
   width: 100%;
-  min-height: 3.6rem;
+  min-height: max(3.6rem, 48px);
   margin-bottom: 0.55rem;
   padding: 0.5rem 0.9rem;
   font-size: 1.12rem;
@@ -637,4 +637,59 @@
 /* Длинные подписи кнопок с рекламой помещаются в одну-две строки. */
 .btn-ad {
   font-size: 1.02rem;
+}
+
+/* Низкое окно (телефон в альбомной ориентации): меню компактнее, а если всё же не помещается — прокручивается. */
+.menu-body {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+@media (orientation: landscape) and (max-height: 560px) {
+  .menu-body {
+    justify-content: flex-start;
+  }
+
+  .logo-tiles {
+    display: none;
+  }
+
+  .menu-title {
+    font-size: 2.2rem;
+  }
+
+  .menu-title br {
+    display: none;
+  }
+
+  .menu-tagline {
+    margin: 0.3rem 1rem 0.8rem;
+  }
+
+  .menu-play {
+    min-height: 4rem;
+  }
+
+  .menu-row {
+    margin-top: 0.8rem;
+  }
+
+  .menu-row .btn {
+    flex-direction: row;
+    min-height: 3.7rem;
+  }
+
+  .menu-row .btn svg {
+    margin: 0 0.4rem 0 0;
+  }
+
+  .win-star {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .win-star:nth-child(2) {
+    width: 3.6rem;
+    height: 3.6rem;
+  }
 }

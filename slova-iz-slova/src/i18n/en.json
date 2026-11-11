@@ -47,7 +47,7 @@
   "toast.source": "The source word does not count",
   "toast.star": "New star! +{n}",
   "toast.coins": "Coins: +{n}",
-  "toast.noReward": "The ad was not finished — no reward",
+  "toast.noReward": "No reward: the ad was unavailable or not finished",
   "toast.purchaseFailed": "The purchase did not go through",
   "toast.notEnough": "Not enough coins",
 

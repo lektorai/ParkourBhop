@@ -108,7 +108,7 @@ npm run build:yandex
 
 ```bash
 npm run build:yandex
-npx sdk-dev-proxy -p dist/yandex --dev-mode=true     # откроет https://localhost:8080
+npx sdk-dev-proxy -p dist/yandex --dev-mode=true     # адрес игры появится в консоли
 ```
 
 С параметром `--app-id=<ID игры>` вместо `--dev-mode` прокси подключается к черновику игры на Яндексе.

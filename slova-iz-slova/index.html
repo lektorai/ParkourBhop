@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#F3E6CF" />
+    <meta name="description" content="%APP_NAME% — спокойная головоломка: составляйте слова из букв одного слова." />
+    <title>%APP_NAME%</title>
+    <style>
+      html, body { height: 100%; margin: 0; }
+      body { background: #F3E6CF; overflow: hidden; }
+      #boot { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 100; display: flex; flex-direction: column;
+        align-items: center; justify-content: center; background: #F3E6CF; color: #1F5A4C;
+        font: 800 34px/1.05 "Nunito", "Trebuchet MS", "Segoe UI", sans-serif; text-align: center; transition: opacity .25s; }
+      #boot.done { opacity: 0; pointer-events: none; }
+      #boot-logo { display: flex; margin-bottom: 18px; }
+      #boot-logo span { width: 46px; height: 46px; margin: 0 3px; border-radius: 11px; display: flex; align-items: center;
+        justify-content: center; font-size: 28px; color: #4A2A12; background: linear-gradient(#EDBB73, #C9873D);
+        box-shadow: 0 4px 0 #9C6226, 0 6px 10px rgba(74, 42, 18, .25); }
+      #boot-title { max-width: 86vw; }
+      #boot-bar { width: 220px; max-width: 70vw; height: 12px; margin-top: 26px; border-radius: 8px; background: rgba(74, 42, 18, .16); overflow: hidden; }
+      #boot-fill { width: 6%; height: 100%; border-radius: 8px; background: #E98A2B; transition: width .25s; }
+    </style>
+  </head>
+  <body class="theme-cozy">
+    <div id="boot" role="status" aria-live="polite" aria-label="Загрузка">
+      <div id="boot-logo" aria-hidden="true"><span>С</span><span>Л</span><span>О</span><span>В</span><span>А</span></div>
+      <div id="boot-title">%APP_NAME%</div>
+      <div id="boot-bar"><div id="boot-fill"></div></div>
+    </div>
+    <div id="app"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

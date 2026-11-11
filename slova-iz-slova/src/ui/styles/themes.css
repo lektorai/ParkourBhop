@@ -1,0 +1,170 @@
+/*
+ * Темы. Все цвета заданы переменными; тема переключается классом на <body>
+ * (и на карточке предпросмотра в экране «Темы»).
+ * Контраст текста проверен скриптом tests/contrast.test.ts (WCAG AA, не ниже 4.5:1).
+ */
+
+.theme-cozy {
+  --page: #f3e6cf;
+  --bg: radial-gradient(120% 70% at 25% 0%, #fbf2e0 0%, #f3e6cf 48%, #e8d3b0 100%);
+  --bg-decor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cg fill='%235e8f62'%3E%3Cpath d='M10 0C60 10 95 45 100 100 50 92 15 55 10 0z' opacity='.5'/%3E%3Cpath d='M0 60c40 2 70 25 80 70C40 126 10 100 0 60z' opacity='.38'/%3E%3Cpath d='M70 0c40 0 70 20 85 55C115 58 85 38 70 0z' opacity='.3'/%3E%3C/g%3E%3C/svg%3E")
+      left top / min(46%, 260px) auto no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cg fill='%235e8f62'%3E%3Cpath d='M200 190c-50-8-88-40-96-96 52 6 90 42 96 96z' opacity='.4'/%3E%3Cpath d='M200 120c-34-4-58-24-66-62 36 4 60 28 66 62z' opacity='.3'/%3E%3C/g%3E%3Ccircle cx='60' cy='170' r='46' fill='%23d9b98a' opacity='.35'/%3E%3C/svg%3E")
+      right bottom / min(44%, 240px) auto no-repeat;
+  --bg-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .42 0 0 0 0 .28 0 0 0 0 .12 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='.38'/%3E%3C/svg%3E");
+  --bg-noise-opacity: 0.55;
+  --veil: rgba(247, 236, 214, 0.42);
+
+  --text: #4a2a12;
+  --text-soft: #6b4a2c;
+  --accent: #1f5a4c;
+  --accent-text: #ffffff;
+  --accent-edge: #123a31;
+  --shadow: rgba(74, 42, 18, 0.22);
+  --focus: #0b3d91;
+  --scrollbar: rgba(74, 42, 18, 0.3);
+
+  --coin-pill: #2c2118;
+  --coin-pill-text: #fff3d6;
+
+  --tile-top: #edbb73;
+  --tile-bottom: #c9873d;
+  --tile-edge: #9c6226;
+  --tile-highlight: rgba(255, 236, 196, 0.85);
+  --tile-text: #40220e;
+  --tile-grain: repeating-linear-gradient(92deg, rgba(120, 70, 20, 0) 0 7px, rgba(120, 70, 20, 0.09) 7px 8px, rgba(120, 70, 20, 0) 8px 15px);
+
+  --panel: #f8ecd3;
+  --panel-border: rgba(156, 98, 38, 0.32);
+  --panel-inset: #efdfbf;
+  --dialog: #fbf1dc;
+  --overlay: rgba(46, 28, 12, 0.55);
+  --toast: #2c2118;
+  --toast-text: #fff3d6;
+
+  --star: #f0a01f;
+  --star-off: rgba(74, 42, 18, 0.22);
+  --progress: #e98a2b;
+  --progress-track: rgba(74, 42, 18, 0.16);
+  --slot: #e6d2ab;
+  --slot-dot: #a98556;
+  --slot-hint: #1f5a4c;
+  --group-head: #1f5a4c;
+  --group-head-text: #ffffff;
+  --input: #1f5a4c;
+  --input-text: #ffffff;
+  --input-placeholder: rgba(255, 255, 255, 0.72);
+  --title: #1f5a4c;
+  --danger: #a3321f;
+}
+
+.theme-sky {
+  --page: #8ec6f4;
+  --bg: linear-gradient(180deg, #6fb6f0 0%, #9fd0f6 55%, #cfeaff 100%);
+  --bg-decor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 120'%3E%3Cpath d='M40 96a30 30 0 0 1 6-59 44 44 0 0 1 84-8 34 34 0 0 1 58 22 24 24 0 0 1 2 45z' fill='%23fff' opacity='.85'/%3E%3C/svg%3E")
+      -8% 9% / min(58%, 320px) auto no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 120'%3E%3Cpath d='M40 96a30 30 0 0 1 6-59 44 44 0 0 1 84-8 34 34 0 0 1 58 22 24 24 0 0 1 2 45z' fill='%23fff' opacity='.7'/%3E%3C/svg%3E")
+      112% 30% / min(50%, 280px) auto no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 120'%3E%3Cpath d='M40 96a30 30 0 0 1 6-59 44 44 0 0 1 84-8 34 34 0 0 1 58 22 24 24 0 0 1 2 45z' fill='%23fff' opacity='.6'/%3E%3C/svg%3E")
+      10% 88% / min(64%, 360px) auto no-repeat;
+  --bg-noise: none;
+  --bg-noise-opacity: 0;
+  --veil: rgba(214, 236, 255, 0.3);
+
+  --text: #1c2f4d;
+  --text-soft: #2a4369;
+  --accent: #1e4e8c;
+  --accent-text: #ffffff;
+  --accent-edge: #12335f;
+  --shadow: rgba(18, 51, 95, 0.25);
+  --focus: #7a1f5c;
+  --scrollbar: rgba(28, 47, 77, 0.3);
+
+  --coin-pill: #16335c;
+  --coin-pill-text: #ffffff;
+
+  --tile-top: #ffffff;
+  --tile-bottom: #edf4fb;
+  --tile-edge: #a9c3df;
+  --tile-highlight: rgba(255, 255, 255, 0.9);
+  --tile-text: #23395b;
+  --tile-grain: none;
+
+  --panel: rgba(244, 250, 255, 0.92);
+  --panel-border: rgba(30, 78, 140, 0.25);
+  --panel-inset: #dcebf9;
+  --dialog: #f4faff;
+  --overlay: rgba(14, 34, 64, 0.55);
+  --toast: #16335c;
+  --toast-text: #ffffff;
+
+  --star: #f5b323;
+  --star-off: rgba(28, 47, 77, 0.22);
+  --progress: #f5b323;
+  --progress-track: rgba(28, 47, 77, 0.2);
+  --slot: #d3e4f5;
+  --slot-dot: #7f9cbd;
+  --slot-hint: #1e4e8c;
+  --group-head: #1e4e8c;
+  --group-head-text: #ffffff;
+  --input: #ffffff;
+  --input-text: #1c2f4d;
+  --input-placeholder: #4a6286;
+  --title: #ffffff;
+  --danger: #a3321f;
+}
+
+.theme-sakura {
+  --page: #f8dce4;
+  --bg: linear-gradient(170deg, #fdeef2 0%, #f8dce4 50%, #f1c3d1 100%);
+  --bg-decor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cg fill='%23e58aa8'%3E%3Cellipse cx='30' cy='26' rx='13' ry='7' transform='rotate(-30 30 26)' opacity='.55'/%3E%3Cellipse cx='84' cy='50' rx='11' ry='6' transform='rotate(20 84 50)' opacity='.45'/%3E%3Cellipse cx='44' cy='92' rx='12' ry='6.5' transform='rotate(-50 44 92)' opacity='.4'/%3E%3Cellipse cx='128' cy='22' rx='10' ry='5.5' transform='rotate(40 128 22)' opacity='.4'/%3E%3Cellipse cx='150' cy='84' rx='9' ry='5' transform='rotate(-15 150 84)' opacity='.3'/%3E%3C/g%3E%3Cpath d='M0 8c40 4 80 26 110 70' stroke='%238a5a4a' stroke-width='5' fill='none' stroke-linecap='round' opacity='.35'/%3E%3C/svg%3E")
+      left top / min(56%, 300px) auto no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cg fill='%23e58aa8'%3E%3Cellipse cx='160' cy='170' rx='13' ry='7' transform='rotate(-30 160 170)' opacity='.5'/%3E%3Cellipse cx='110' cy='150' rx='11' ry='6' transform='rotate(25 110 150)' opacity='.4'/%3E%3Cellipse cx='150' cy='110' rx='10' ry='5.5' transform='rotate(-55 150 110)' opacity='.35'/%3E%3Cellipse cx='70' cy='180' rx='10' ry='5.5' transform='rotate(40 70 180)' opacity='.35'/%3E%3C/g%3E%3C/svg%3E")
+      right bottom / min(50%, 280px) auto no-repeat;
+  --bg-noise: none;
+  --bg-noise-opacity: 0;
+  --veil: rgba(253, 238, 242, 0.35);
+
+  --text: #5a2333;
+  --text-soft: #74324a;
+  /* Темнее, чем на референсе: розовое поле ввода сливалось с розовым фоном. */
+  --accent: #b83d66;
+  --accent-text: #ffffff;
+  --accent-edge: #8a264a;
+  --shadow: rgba(138, 38, 74, 0.22);
+  --focus: #15407a;
+  --scrollbar: rgba(90, 35, 51, 0.3);
+
+  --coin-pill: #4a1c2b;
+  --coin-pill-text: #fff0f4;
+
+  --tile-top: #ffffff;
+  --tile-bottom: #ffe6ed;
+  --tile-edge: #e2a3b7;
+  --tile-highlight: rgba(255, 255, 255, 0.9);
+  --tile-text: #5a2333;
+  --tile-grain: none;
+
+  --panel: rgba(255, 244, 247, 0.93);
+  --panel-border: rgba(184, 61, 102, 0.28);
+  --panel-inset: #f7d6e0;
+  --dialog: #fff5f8;
+  --overlay: rgba(64, 20, 36, 0.55);
+  --toast: #4a1c2b;
+  --toast-text: #fff0f4;
+
+  --star: #e8a020;
+  --star-off: rgba(90, 35, 51, 0.2);
+  --progress: #e06a8f;
+  --progress-track: rgba(90, 35, 51, 0.16);
+  --slot: #f3cdd9;
+  --slot-dot: #b9788e;
+  --slot-hint: #a12f58;
+  --group-head: #b83d66;
+  --group-head-text: #ffffff;
+  --input: #b83d66;
+  --input-text: #ffffff;
+  --input-placeholder: rgba(255, 255, 255, 0.82);
+  --title: #a12f58;
+  --danger: #a3321f;
+}

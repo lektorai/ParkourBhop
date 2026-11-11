@@ -33,7 +33,7 @@ function WinDialog({ modal }: { modal: Extract<Modal, { type: 'win' }> }) {
           {isLast ? t('win.menu') : t('win.next')}
         </button>
         {!modal.doubled && modal.reward > 0 && (
-          <button type="button" class="btn btn-wood" data-testid="win-double" onClick={() => void game.doubleWinReward()}>
+          <button type="button" class="btn btn-wood btn-ad" data-testid="win-double" onClick={() => void game.doubleWinReward()}>
             <IconVideo />
             {t('win.double')}
           </button>
@@ -87,7 +87,7 @@ function NoCoinsDialog() {
       <div class="dialog-actions">
         <button
           type="button"
-          class="btn"
+          class="btn btn-ad"
           data-testid="nocoins-ad"
           onClick={async () => {
             const result = await game.hintForAd();

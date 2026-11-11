@@ -27,7 +27,8 @@ export function useStageSize(getElement: () => HTMLElement | null): StageSize {
       const width = element.clientWidth;
       const height = element.clientHeight;
       const compact = window.innerWidth > window.innerHeight && window.innerHeight <= 560;
-      const rem = Math.max(13, Math.min(20, width / 24, height / 36));
+      // Невысокое окно (ноутбук, планшет в альбомной) — шрифт и плитки мельче, чтобы списку слов хватало места.
+      const rem = Math.max(13, Math.min(20, width / 24, height / 42));
       document.documentElement.style.fontSize = `${rem.toFixed(2)}px`;
       setSize((prev) =>
         prev.width === width && prev.height === height && prev.rem === rem && prev.compact === compact

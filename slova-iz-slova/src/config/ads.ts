@@ -11,11 +11,12 @@ export const ADS = {
 /**
  * Идентификаторы рекламных блоков Yandex Mobile Ads для сборки RuStore.
  * Боевые значения задаются в .env (см. .env.example); без них используются демо-блоки Яндекса.
+ * В отладочной сборке Android демо-блоки используются всегда.
  */
 export const RUSTORE_AD_UNITS = {
-  interstitial: (import.meta.env?.VITE_YANDEX_ADS_INTERSTITIAL_ID as string | undefined) || 'demo-interstitial-yandex',
-  rewarded: (import.meta.env?.VITE_YANDEX_ADS_REWARDED_ID as string | undefined) || 'demo-rewarded-yandex',
+  interstitial: __RUSTORE_CONFIG__.interstitialId,
+  rewarded: __RUSTORE_CONFIG__.rewardedId,
 } as const;
 
-/** Покупки в сборке RuStore включаются флагом (нужен статус ИП или юрлица). */
-export const RUSTORE_PAYMENTS_ENABLED = import.meta.env?.VITE_PAYMENTS_ENABLED === 'true';
+/** Покупки в сборке RuStore включаются флагом PAYMENTS_ENABLED (нужен статус ИП или юрлица). */
+export const RUSTORE_PAYMENTS_ENABLED = __RUSTORE_CONFIG__.payments;

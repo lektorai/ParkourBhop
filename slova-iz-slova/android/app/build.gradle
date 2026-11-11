@@ -1,0 +1,106 @@
+apply plugin: 'com.android.application'
+apply plugin: 'org.jetbrains.kotlin.android'
+
+// Название, имя пакета и версия приходят из src/config/app.ts: их записывает сюда
+// scripts/build-rustore.ts (файл android/app-config.properties). Руками эти значения не меняются.
+def appConfig = new Properties()
+def appConfigFile = rootProject.file('app-config.properties')
+if (appConfigFile.exists()) {
+    appConfigFile.withInputStream { appConfig.load(it) }
+}
+
+// Ключ подписи: android/keystore.properties (в git не попадает, см. README).
+def keystoreProps = new Properties()
+def keystoreFile = rootProject.file('keystore.properties')
+def hasKeystore = keystoreFile.exists()
+if (hasKeystore) {
+    keystoreFile.withInputStream { keystoreProps.load(it) }
+}
+
+def appId = appConfig.getProperty('appId', 'ru.lektorai.slovaizslova')
+
+android {
+    namespace "ru.lektorai.slovaizslova"
+    compileSdk rootProject.ext.compileSdkVersion
+
+    defaultConfig {
+        applicationId appId
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode Integer.parseInt(appConfig.getProperty('versionCode', '1'))
+        versionName appConfig.getProperty('versionName', '1.0.0')
+        aaptOptions {
+            // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+            ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+
+    signingConfigs {
+        release {
+            if (hasKeystore) {
+                storeFile rootProject.file(keystoreProps.getProperty('storeFile'))
+                storePassword keystoreProps.getProperty('storePassword')
+                keyAlias keystoreProps.getProperty('keyAlias')
+                keyPassword keystoreProps.getProperty('keyPassword')
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (hasKeystore) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+
+    // Покупки включаются флагом PAYMENTS_ENABLED (нужен статус ИП или юрлица в RuStore).
+    // Вариант nopay не содержит платёжного SDK и его разрешений вообще.
+    flavorDimensions "payments"
+    productFlavors {
+        nopay {
+            dimension "payments"
+        }
+        pay {
+            dimension "payments"
+            // Идентификатор приложения из RuStore Консоли и схема для возврата из банковских приложений.
+            resValue "string", "rustore_console_app_id", appConfig.getProperty('rustoreConsoleAppId', '0')
+            manifestPlaceholders = [payScheme: "${appId}.pay"]
+        }
+    }
+
+    // Версия Java задаётся Capacitor (capacitor.build.gradle): 21. Kotlin должен совпадать.
+    kotlinOptions {
+        jvmTarget = '21'
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+}
+
+repositories {
+    flatDir {
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    implementation project(':capacitor-cordova-android-plugins')
+
+    // Реклама: Yandex Mobile Ads SDK (полноэкранная и за награду).
+    implementation 'com.yandex.android:mobileads:8.6.0'
+
+    // Платежи: Pay SDK RuStore — только в варианте pay.
+    payImplementation platform('ru.rustore.sdk:bom:2026.10.01')
+    payImplementation 'ru.rustore.sdk:pay'
+}
+
+apply from: 'capacitor.build.gradle'

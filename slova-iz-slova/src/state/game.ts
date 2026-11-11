@@ -169,8 +169,8 @@ export class Game {
     onProgress(1);
     this.store.set({ ready: true });
 
-    // Остальное грузится в фоне, меню уже доступно.
-    void this.loadDictionary();
+    // Остальное грузится в фоне, меню уже доступно. Словарь — чуть позже, чтобы не мешать первой отрисовке.
+    window.setTimeout(() => void this.loadDictionary(), 600);
     void this.refreshCatalog();
     void this.processPurchases();
     this.platform.setBannerVisible(!merged.noAds);

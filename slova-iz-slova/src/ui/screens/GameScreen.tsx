@@ -95,7 +95,13 @@ function Board({ level, progress }: { level: LevelData; progress: LevelProgress 
 
   const letters = useMemo(() => Array.from(level.source.toUpperCase()), [level.source]);
   const [order, setOrder] = useState<number[]>(() => letters.map((_, i) => i));
-  const [picked, setPicked] = useState<number[]>([]);
+  const [picked, setPickedState] = useState<number[]>([]);
+  // Нажатия могут приходить быстрее, чем перерисовка, поэтому актуальный набор букв держим ещё и в ref.
+  const pickedRef = useRef<number[]>([]);
+  const setPicked = useCallback((next: number[]) => {
+    pickedRef.current = next;
+    setPickedState(next);
+  }, []);
   const [shake, setShake] = useState(0);
   const [arriving, setArriving] = useState<string | null>(null);
   const [popWord, setPopWord] = useState<string | null>(null);
@@ -116,7 +122,7 @@ function Board({ level, progress }: { level: LevelData; progress: LevelProgress 
   const stars = starsFor(progress.found.length, total);
   const targets = starTargets(total);
   const tutorialWord = game.tutorialWord.toUpperCase();
-  const inputLocked = busy || Boolean(modal) || arriving !== null;
+  const inputLocked = busy || Boolean(modal);
 
   useEffect(
     () => () => {
@@ -140,6 +146,7 @@ function Board({ level, progress }: { level: LevelData; progress: LevelProgress 
   const pick = useCallback(
     (tile: number) => {
       if (inputLocked) return;
+      const picked = pickedRef.current;
       const position = picked.indexOf(tile);
       if (tutorialStep === 2 || tutorialStep === 3) return;
       if (tutorialStep === 1) {
@@ -158,20 +165,21 @@ function Board({ level, progress }: { level: LevelData; progress: LevelProgress 
       game.haptic('tap');
       if (tutorialStep === 1 && next.map((i) => letters[i]).join('') === tutorialWord) game.setTutorialStep(2);
     },
-    [game, inputLocked, letters, picked, tutorialStep, tutorialWord],
+    [game, inputLocked, letters, setPicked, tutorialStep, tutorialWord],
   );
 
   const erase = useCallback(() => {
+    const picked = pickedRef.current;
     if (inputLocked || tutorialStep !== 0 || picked.length === 0) return;
     setPicked(picked.slice(0, -1));
     game.sound('untap');
-  }, [game, inputLocked, picked, tutorialStep]);
+  }, [game, inputLocked, setPicked, tutorialStep]);
 
   const clear = useCallback(() => {
-    if (inputLocked || tutorialStep !== 0 || picked.length === 0) return;
+    if (inputLocked || tutorialStep !== 0 || pickedRef.current.length === 0) return;
     setPicked([]);
     game.sound('untap');
-  }, [game, inputLocked, picked, tutorialStep]);
+  }, [game, inputLocked, setPicked, tutorialStep]);
 
   const shuffle = useCallback(() => {
     if (inputLocked) return;
@@ -218,6 +226,7 @@ function Board({ level, progress }: { level: LevelData; progress: LevelProgress 
   );
 
   const submit = useCallback(() => {
+    const typed = pickedRef.current.map((i) => letters[i]).join('');
     if (inputLocked || typed.length === 0 || tutorialStep === 1 || tutorialStep === 3) return;
     const result = game.submit(typed);
     switch (result.kind) {
@@ -264,9 +273,15 @@ function Board({ level, progress }: { level: LevelData; progress: LevelProgress 
         setShake((n) => n + 1);
         if (result.kind === 'too-short') game.showToast('info', t('toast.short'));
         if (result.kind === 'source') game.showToast('info', t('toast.source'));
-        later(() => setPicked([]), 380);
+        // Поле очищается после тряски, если игрок за это время не начал новое слово.
+        {
+          const wrong = pickedRef.current;
+          later(() => {
+            if (pickedRef.current === wrong) setPicked([]);
+          }, 380);
+        }
     }
-  }, [afterFound, flashWord, game, inputLocked, tutorialStep, typed]);
+  }, [afterFound, flashWord, game, inputLocked, letters, setPicked, tutorialStep]);
 
   const hint = useCallback(() => {
     if (inputLocked || tutorialStep !== 0) return;
@@ -302,7 +317,7 @@ function Board({ level, progress }: { level: LevelData; progress: LevelProgress 
       }
       const letter = keyToLetter(event.key, event.code)?.toUpperCase();
       if (!letter) return;
-      const tile = order.find((i) => letters[i] === letter && !picked.includes(i));
+      const tile = order.find((i) => letters[i] === letter && !pickedRef.current.includes(i));
       if (tile !== undefined) {
         event.preventDefault();
         pick(tile);
@@ -310,7 +325,7 @@ function Board({ level, progress }: { level: LevelData; progress: LevelProgress 
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [erase, inputLocked, letters, order, pick, picked, shuffle, submit]);
+  }, [erase, inputLocked, letters, order, pick, shuffle, submit]);
 
   // --- долгое нажатие на «Стереть» очищает слово целиком -----------------------------
   const eraseDown = () => {

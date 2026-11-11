@@ -20,3 +20,4 @@ android/app/src/main/assets/capacitor.config.json
 android/app/src/main/assets/capacitor.plugins.json
 android/app/src/main/res/xml/config.xml
 .DS_Store
+android/app-config.properties

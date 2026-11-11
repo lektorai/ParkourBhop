@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import preact from '@preact/preset-vite';
-import type { Plugin } from 'vite';
+import { loadEnv, type Plugin } from 'vite';
 import { defineConfig } from 'vitest/config';
 import { APP_NAME } from './src/config/app';
 import { THEMES } from './src/config/economy';
@@ -10,6 +10,14 @@ const platform = (process.env.PLATFORM ?? 'local') as 'yandex' | 'rustore' | 'lo
 if (!['yandex', 'rustore', 'local'].includes(platform)) {
   throw new Error(`Неизвестная площадка PLATFORM=${platform}. Допустимо: yandex, rustore, local`);
 }
+
+// Настройки сборки RuStore берутся из .env (см. .env.example) или из переменных окружения.
+const env = { ...loadEnv('production', __dirname, ''), ...process.env };
+const rustoreConfig = {
+  interstitialId: env.YANDEX_ADS_INTERSTITIAL_ID || 'demo-interstitial-yandex',
+  rewardedId: env.YANDEX_ADS_REWARDED_ID || 'demo-rewarded-yandex',
+  payments: env.PAYMENTS_ENABLED === 'true',
+};
 
 /** Растровые фоны тем: если файл лежит в public/assets/themes/<тема>/, он заменяет CSS-фон. */
 function themeBackgrounds(): Record<string, { portrait: boolean; landscape: boolean }> {
@@ -50,6 +58,7 @@ export default defineConfig({
   define: {
     __PLATFORM__: JSON.stringify(platform),
     __THEME_BACKGROUNDS__: JSON.stringify(themeBackgrounds()),
+    __RUSTORE_CONFIG__: JSON.stringify(rustoreConfig),
   },
   build: {
     outDir: `dist/${platform}`,

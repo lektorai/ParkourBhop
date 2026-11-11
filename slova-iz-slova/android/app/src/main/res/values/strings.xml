@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- Файл создаётся scripts/build-rustore.ts из src/config/app.ts. Не редактируйте вручную. -->
+<resources>
+    <string name="app_name">Слова из слова</string>
+    <string name="title_activity_main">Слова из слова</string>
+    <string name="package_name">ru.lektorai.slovaizslova</string>
+    <string name="custom_url_scheme">ru.lektorai.slovaizslova</string>
+</resources>

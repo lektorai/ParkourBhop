@@ -77,7 +77,7 @@ export function Shop() {
         <section class="panel shop-free">
           <button
             type="button"
-            class="btn"
+            class="btn btn-ad"
             data-testid="ad-coins"
             disabled={adLeft <= 0}
             onClick={async () => {

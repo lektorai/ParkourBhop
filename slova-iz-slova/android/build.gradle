@@ -1,0 +1,27 @@
+// Корневой файл сборки Android-проекта (Capacitor) для RuStore.
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.7.2'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.0'
+    }
+}
+
+apply from: "variables.gradle"
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        // Платёжный SDK RuStore (нужен только варианту сборки pay).
+        maven { url = uri("https://nexus-external.rustore.ru/repository/maven-rustore-exposed") }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
